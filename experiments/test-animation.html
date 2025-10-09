@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Animation Test - api2app Chat Widget</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+        }
+        .info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Animation Test - api2app Chat Widget</h1>
+        <p>This page tests the new animation feature for the chat widget.</p>
+        <p><strong>Expected behavior:</strong></p>
+        <ul>
+            <li>When opening: The chat box should slide up from bottom with fade-in effect</li>
+            <li>When closing: The chat box should slide down with fade-out effect</li>
+            <li>Animation duration: 300ms</li>
+        </ul>
+        <p>Click the blue chat button in the bottom-right corner to test.</p>
+    </div>
+
+    <script src="../api2app-chat-widget.js"></script>
+    <script>
+        const chatWidget = new Api2AppChatWidget(
+            'https://api2app.org/ru/apps/embed/cd635a6f-41a8-4d24-800e-4f950f3e128f', {
+                buttonColor: '#007bff',
+                hoverColor: '#0056b3',
+                position: 'bottom-right',
+                width: 350,
+                height: 455
+            });
+    </script>
+</body>
+</html>
