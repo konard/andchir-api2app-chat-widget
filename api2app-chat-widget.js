@@ -106,6 +106,11 @@ class Api2AppChatWidget {
         this.iframeBox.style.border = '1px solid rgba(0,0,0,0.15)';
         this.iframeBox.style.backgroundColor = '#fff';
 
+        // Animation properties
+        this.iframeBox.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
+        this.iframeBox.style.opacity = '0';
+        this.iframeBox.style.transform = 'translateY(20px)';
+
         this.iframe = document.createElement('iframe');
         this.iframe.style.width = '100%';
         this.iframe.style.height = '100%';
@@ -220,15 +225,30 @@ class Api2AppChatWidget {
         this.iframeBox.style.display = 'block';
         this.button.innerHTML = this.getArrowIcon();
         this.backdrop.style.display = this.options.useBackdrop ? 'block' : 'none';
+
+        // Trigger animation after display is set
+        setTimeout(() => {
+            this.iframeBox.style.opacity = '1';
+            this.iframeBox.style.transform = 'translateY(0)';
+        }, 10);
     }
 
     close() {
         this.isOpen = false;
-        this.container.style.height = 'auto';
-        this.container.style.minHeight = 'auto';
-        this.container.style.width = 'auto';
-        this.iframeBox.style.display = 'none';
-        this.backdrop.style.display = 'none';
+
+        // Trigger close animation
+        this.iframeBox.style.opacity = '0';
+        this.iframeBox.style.transform = 'translateY(20px)';
+
+        // Wait for animation to complete before hiding
+        setTimeout(() => {
+            this.container.style.height = 'auto';
+            this.container.style.minHeight = 'auto';
+            this.container.style.width = 'auto';
+            this.iframeBox.style.display = 'none';
+            this.backdrop.style.display = 'none';
+        }, 300); // Match transition duration
+
         this.button.innerHTML = this.getChatIcon();
     }
 

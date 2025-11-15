@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Animation Test - api2app-chat-widget</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: sans-serif;
+            min-height: 100vh;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Animation Testing Suite</h1>
+
+<div class="info">
+    <strong>Testing:</strong> Open/close animations with slide (translateY) and opacity transitions
+</div>
+
+<div class="test-section">
+    <h2>Test 1: Bottom-Right Position (Default)</h2>
+    <button id="test1-open">Open Widget</button>
+    <button id="test1-close">Close Widget</button>
+    <button id="test1-toggle">Toggle Widget</button>
+    <p>Expected: Slides up from bottom with fade-in on open, slides down with fade-out on close</p>
+</div>
+
+<div class="test-section">
+    <h2>Test 2: Bottom-Left Position</h2>
+    <button id="test2-open">Open Widget</button>
+    <button id="test2-close">Close Widget</button>
+    <button id="test2-toggle">Toggle Widget</button>
+    <p>Expected: Same animation behavior from bottom-left corner</p>
+</div>
+
+<div class="test-section">
+    <h2>Test 3: Top-Right Position</h2>
+    <button id="test3-open">Open Widget</button>
+    <button id="test3-close">Close Widget</button>
+    <button id="test3-toggle">Toggle Widget</button>
+    <p>Expected: Slides up from bottom with fade-in on open (even from top position)</p>
+</div>
+
+<div class="test-section">
+    <h2>Test 4: Top-Left Position</h2>
+    <button id="test4-open">Open Widget</button>
+    <button id="test4-close">Close Widget</button>
+    <button id="test4-toggle">Toggle Widget</button>
+    <p>Expected: Same animation from top-left corner</p>
+</div>
+
+<div class="test-section">
+    <h2>Test 5: Rapid Toggle Test</h2>
+    <button id="test5-rapid">Rapid Toggle (5 times)</button>
+    <p>Expected: Animations should handle rapid toggling gracefully</p>
+</div>
+
+<script src="../api2app-chat-widget.js"></script>
+<script>
+    // Test 1: Bottom-Right
+    const widget1 = new Api2AppChatWidget(
+        'https://api2app.org/ru/apps/embed/cd635a6f-41a8-4d24-800e-4f950f3e128f', {
+            buttonColor: '#007bff',
+            hoverColor: '#0056b3',
+            position: 'bottom-right',
+            width: 350,
+            height: 400
+        });
+
+    document.getElementById('test1-open').onclick = () => widget1.open();
+    document.getElementById('test1-close').onclick = () => widget1.close();
+    document.getElementById('test1-toggle').onclick = () => widget1.toggle();
+
+    // Test 2: Bottom-Left
+    const widget2 = new Api2AppChatWidget(
+        'https://api2app.org/ru/apps/embed/cd635a6f-41a8-4d24-800e-4f950f3e128f', {
+            buttonColor: '#28a745',
+            hoverColor: '#218838',
+            position: 'bottom-left',
+            width: 350,
+            height: 400
+        });
+
+    document.getElementById('test2-open').onclick = () => widget2.open();
+    document.getElementById('test2-close').onclick = () => widget2.close();
+    document.getElementById('test2-toggle').onclick = () => widget2.toggle();
+
+    // Test 3: Top-Right
+    const widget3 = new Api2AppChatWidget(
+        'https://api2app.org/ru/apps/embed/cd635a6f-41a8-4d24-800e-4f950f3e128f', {
+            buttonColor: '#dc3545',
+            hoverColor: '#c82333',
+            position: 'top-right',
+            width: 350,
+            height: 400
+        });
+
+    document.getElementById('test3-open').onclick = () => widget3.open();
+    document.getElementById('test3-close').onclick = () => widget3.close();
+    document.getElementById('test3-toggle').onclick = () => widget3.toggle();
+
+    // Test 4: Top-Left
+    const widget4 = new Api2AppChatWidget(
+        'https://api2app.org/ru/apps/embed/cd635a6f-41a8-4d24-800e-4f950f3e128f', {
+            buttonColor: '#ffc107',
+            hoverColor: '#e0a800',
+            position: 'top-left',
+            width: 350,
+            height: 400
+        });
+
+    document.getElementById('test4-open').onclick = () => widget4.open();
+    document.getElementById('test4-close').onclick = () => widget4.close();
+    document.getElementById('test4-toggle').onclick = () => widget4.toggle();
+
+    // Test 5: Rapid Toggle
+    document.getElementById('test5-rapid').onclick = async () => {
+        for (let i = 0; i < 5; i++) {
+            widget1.toggle();
+            await new Promise(resolve => setTimeout(resolve, 400));
+        }
+    };
+
+    console.log('Animation test suite loaded');
+    console.log('- Widget 1 (bottom-right): Blue button');
+    console.log('- Widget 2 (bottom-left): Green button');
+    console.log('- Widget 3 (top-right): Red button');
+    console.log('- Widget 4 (top-left): Yellow button');
+</script>
+
+</body>
+</html>
