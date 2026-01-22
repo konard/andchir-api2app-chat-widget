@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tooltip Test - api2app Chat Widget</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: sans-serif;
+            min-height: 100vh;
+        }
+        .test-info {
+            max-width: 600px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        .test-info h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Tooltip Test - api2app-chat-widget</h1>
+
+<div class="test-info">
+    <h3>Test Instructions:</h3>
+    <ol>
+        <li>Hover over the chat button in the bottom-right corner</li>
+        <li>A tooltip with text "Открыть чат" should slide out from the left</li>
+        <li>The tooltip should have white text on a black semi-transparent background</li>
+        <li>The background should be pill-shaped (rounded)</li>
+        <li>The tooltip should disappear when you move the mouse away</li>
+        <li>The tooltip should NOT appear when the chat is open</li>
+    </ol>
+</div>
+
+<div class="test-info">
+    <h3>Test Cases:</h3>
+    <ul>
+        <li><strong>Position bottom-right:</strong> Check the default position below</li>
+        <li><strong>Position bottom-left:</strong> Check button with tooltip on the left side</li>
+    </ul>
+</div>
+
+<script src="../api2app-chat-widget.js"></script>
+<script>
+    // Test 1: Bottom-right position with tooltip
+    const chatWidget1 = new Api2AppChatWidget(
+        'https://api2app.org/ru/apps/embed/cd635a6f-41a8-4d24-800e-4f950f3e128f', {
+            buttonColor: '#007bff',
+            hoverColor: '#0056b3',
+            position: 'bottom-right',
+            width: 350,
+            height: 455,
+            tooltipText: 'Открыть чат'
+        });
+
+    // Add a second widget to test bottom-left position
+    setTimeout(() => {
+        const chatWidget2 = new Api2AppChatWidget(
+            'https://api2app.org/ru/apps/embed/cd635a6f-41a8-4d24-800e-4f950f3e128f', {
+                buttonColor: '#28a745',
+                hoverColor: '#218838',
+                position: 'bottom-left',
+                width: 350,
+                height: 455,
+                tooltipText: 'Открыть чат'
+            });
+    }, 500);
+</script>
+
+</body>
+</html>

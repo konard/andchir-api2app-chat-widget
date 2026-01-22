@@ -12,6 +12,7 @@ class Api2AppChatWidget {
             width: 350,
             height: 400,
             useBackdrop: true,
+            tooltipText: '', // Optional tooltip text, e.g., 'Открыть чат'
             ...options
         };
 
@@ -121,6 +122,13 @@ class Api2AppChatWidget {
     }
 
     createButton() {
+        // Create button wrapper to hold both button and tooltip
+        this.buttonWrapper = document.createElement('div');
+        this.buttonWrapper.style.position = 'relative';
+        this.buttonWrapper.style.display = 'flex';
+        this.buttonWrapper.style.alignItems = 'center';
+        this.buttonWrapper.style.flexShrink = '0';
+
         this.button = document.createElement('button');
         this.button.style.width = '60px';
         this.button.style.height = '60px';
@@ -138,15 +146,58 @@ class Api2AppChatWidget {
         this.button.style.transformOrigin = 'center center';
 
         this.button.innerHTML = this.getChatIcon();
-        this.container.appendChild(this.button);
+        this.buttonWrapper.appendChild(this.button);
+
+        // Create tooltip if tooltipText is provided
+        if (this.options.tooltipText) {
+            this.createTooltip();
+        }
+
+        this.container.appendChild(this.buttonWrapper);
+    }
+
+    createTooltip() {
+        this.tooltip = document.createElement('div');
+        this.tooltip.textContent = this.options.tooltipText;
+        this.tooltip.style.position = 'absolute';
+        this.tooltip.style.pointerEvents = 'none';
+        this.tooltip.style.whiteSpace = 'nowrap';
+        this.tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        this.tooltip.style.color = '#ffffff';
+        this.tooltip.style.padding = '8px 16px';
+        this.tooltip.style.borderRadius = '20px';
+        this.tooltip.style.fontSize = '14px';
+        this.tooltip.style.fontWeight = '500';
+        this.tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        this.tooltip.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
+        this.tooltip.style.opacity = '0';
+        this.tooltip.style.zIndex = '1';
+
+        // Position tooltip to the left of the button
+        const isRightSide = this.options.position.includes('right');
+        if (isRightSide) {
+            this.tooltip.style.right = '70px';
+            this.tooltip.style.transform = 'translateX(10px)';
+        } else {
+            this.tooltip.style.left = '70px';
+            this.tooltip.style.transform = 'translateX(-10px)';
+        }
+
+        this.buttonWrapper.appendChild(this.tooltip);
     }
 
     setupEventListeners() {
         this.button.onmouseover = () => {
             this.button.style.backgroundColor = this.options.hoverColor;
+            if (this.tooltip && !this.isOpen) {
+                this.showTooltip();
+            }
         };
         this.button.onmouseout = () => {
             this.button.style.backgroundColor = this.options.buttonColor;
+            if (this.tooltip) {
+                this.hideTooltip();
+            }
         };
         this.button.onmousedown = () => {
             this.button.style.transform = 'scale(0.9)';
@@ -195,6 +246,21 @@ class Api2AppChatWidget {
             this.iframeBox.style.border = '1px solid rgba(0,0,0,0.15)';
         }
         this.updateContainerPosition(e.matches);
+    }
+
+    showTooltip() {
+        if (this.tooltip) {
+            this.tooltip.style.opacity = '1';
+            this.tooltip.style.transform = 'translateX(0)';
+        }
+    }
+
+    hideTooltip() {
+        if (this.tooltip) {
+            this.tooltip.style.opacity = '0';
+            const isRightSide = this.options.position.includes('right');
+            this.tooltip.style.transform = isRightSide ? 'translateX(10px)' : 'translateX(-10px)';
+        }
     }
 
     getChatIcon() {
