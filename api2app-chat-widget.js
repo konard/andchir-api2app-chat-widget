@@ -425,7 +425,7 @@ class Api2AppChatWidget {
             // Calculate distance based on button position
             const distance = (index + 1) * 70; // 60px button + 10px gap
             if (isTopPosition) {
-                btnWrapper.style.transform = `translateY(-${distance}px)`;
+                btnWrapper.style.transform = `translateY(${distance}px)`;
             } else {
                 btnWrapper.style.transform = `translateY(-${distance}px)`;
             }
