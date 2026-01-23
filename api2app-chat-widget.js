@@ -361,6 +361,11 @@ class Api2AppChatWidget {
 
         this.button.onclick = (e) => {
             e.preventDefault();
+            // Hide hover buttons and tooltip with animation when main button is clicked
+            this.hideHoverButtons();
+            if (this.tooltip) {
+                this.hideTooltip();
+            }
             setTimeout(() => {
                 this.toggle();
             }, 100);
