@@ -206,58 +206,54 @@ class Api2AppChatWidget {
                 btnWrapper.style.bottom = '0';
             }
 
+            // Create link styled as a button (no button element inside link)
             const link = document.createElement('a');
             link.href = hoverBtn.href || '#';
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
             link.style.textDecoration = 'none';
-            link.style.display = 'block';
-
-            const btn = document.createElement('button');
-            btn.style.width = '60px';
-            btn.style.height = '60px';
-            btn.style.borderRadius = '50%';
-            btn.style.backgroundColor = hoverBtn.buttonColor || this.options.buttonColor;
-            btn.style.border = 'none';
-            btn.style.cursor = 'pointer';
-            btn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-            btn.style.display = 'flex';
-            btn.style.alignItems = 'center';
-            btn.style.justifyContent = 'center';
-            btn.style.transition = 'background-color 0.3s, transform 0.1s ease-in-out';
-            btn.style.transform = 'scale(1)';
-            btn.style.transformOrigin = 'center center';
+            link.style.display = 'flex';
+            link.style.width = '60px';
+            link.style.height = '60px';
+            link.style.borderRadius = '50%';
+            link.style.backgroundColor = hoverBtn.buttonColor || this.options.buttonColor;
+            link.style.cursor = 'pointer';
+            link.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            link.style.alignItems = 'center';
+            link.style.justifyContent = 'center';
+            link.style.transition = 'background-color 0.3s, transform 0.1s ease-in-out';
+            link.style.transform = 'scale(1)';
+            link.style.transformOrigin = 'center center';
 
             if (hoverBtn.icon) {
-                btn.innerHTML = hoverBtn.icon;
+                link.innerHTML = hoverBtn.icon;
             }
 
             const originalColor = hoverBtn.buttonColor || this.options.buttonColor;
             const hoverColor = hoverBtn.hoverColor || this.options.hoverColor;
 
-            btn.onmouseover = () => {
-                btn.style.backgroundColor = hoverColor;
+            link.onmouseover = () => {
+                link.style.backgroundColor = hoverColor;
                 if (hoverBtn.tooltipText) {
                     this.showHoverButtonTooltip(btnWrapper);
                 }
             };
-            btn.onmouseout = () => {
-                btn.style.backgroundColor = originalColor;
+            link.onmouseout = () => {
+                link.style.backgroundColor = originalColor;
                 if (hoverBtn.tooltipText) {
                     this.hideHoverButtonTooltip(btnWrapper);
                 }
             };
-            btn.onmousedown = () => {
-                btn.style.transform = 'scale(0.9)';
+            link.onmousedown = () => {
+                link.style.transform = 'scale(0.9)';
             };
-            btn.onmouseup = () => {
-                btn.style.transform = 'scale(1)';
+            link.onmouseup = () => {
+                link.style.transform = 'scale(1)';
             };
-            btn.onmouseleave = () => {
-                btn.style.transform = 'scale(1)';
+            link.onmouseleave = () => {
+                link.style.transform = 'scale(1)';
             };
 
-            link.appendChild(btn);
             btnWrapper.appendChild(link);
 
             // Create tooltip for hover button if provided
@@ -342,7 +338,8 @@ class Api2AppChatWidget {
 
         this.button.onmouseover = () => {
             this.button.style.backgroundColor = this.options.hoverColor;
-            if (this.tooltip && !this.isOpen && !this.hoverButtonsVisible) {
+            // Show tooltip when hovering on the main button (even when hover buttons are visible)
+            if (this.tooltip && !this.isOpen) {
                 this.showTooltip();
             }
         };
@@ -421,11 +418,6 @@ class Api2AppChatWidget {
 
         clearTimeout(this.hoverTimeout);
         this.hoverButtonsVisible = true;
-
-        // Hide main button tooltip when showing hover buttons
-        if (this.tooltip) {
-            this.hideTooltip();
-        }
 
         const isTopPosition = this.options.position.includes('top');
 
