@@ -189,13 +189,22 @@ class Api2AppChatWidget {
 
         this.options.hoverButtons.forEach((hoverBtn, index) => {
             const btnWrapper = document.createElement('div');
-            btnWrapper.style.position = 'relative';
+            btnWrapper.style.position = 'absolute';
             btnWrapper.style.display = 'flex';
             btnWrapper.style.alignItems = 'center';
             btnWrapper.style.opacity = '0';
             btnWrapper.style.transform = 'translateY(0)';
             btnWrapper.style.transition = `opacity 0.3s ease-in-out, transform 0.3s ease-in-out ${index * 0.05}s`;
             btnWrapper.style.pointerEvents = 'auto';
+            btnWrapper.style.left = '0';
+
+            // Position based on widget position (top or bottom)
+            const isTopPosition = this.options.position.includes('top');
+            if (isTopPosition) {
+                btnWrapper.style.top = '0';
+            } else {
+                btnWrapper.style.bottom = '0';
+            }
 
             const link = document.createElement('a');
             link.href = hoverBtn.href || '#';
@@ -423,9 +432,10 @@ class Api2AppChatWidget {
         this.hoverButtonElements.forEach((btnWrapper, index) => {
             btnWrapper.style.opacity = '1';
             // Calculate distance based on button position
+            // Each button should be positioned at a unique offset from the main button
             const distance = (index + 1) * 70; // 60px button + 10px gap
             if (isTopPosition) {
-                btnWrapper.style.transform = `translateY(-${distance}px)`;
+                btnWrapper.style.transform = `translateY(${distance}px)`;
             } else {
                 btnWrapper.style.transform = `translateY(-${distance}px)`;
             }
