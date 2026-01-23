@@ -23,7 +23,11 @@
             useBackDrop: true,
             width: 350,
             height: 465,
-            tooltipText: 'Открыть чат' // Optional tooltip text
+            tooltipText: 'Открыть чат', // Optional tooltip text
+            hoverButtons: [ // Optional hover buttons that appear on hover
+                {buttonColor: '#25d366', hoverColor: '#128c7e', tooltipText: 'Позвоните нам!', href: 'https://example.com', icon: '&lt;svg /&gt;'},
+                {buttonColor: '#0088cc', hoverColor: '#036ca1', tooltipText: 'Мы в Телеграм!', href: 'https://example.com', icon: '&lt;svg /&gt;'}
+            ]
         });
 &lt;/script&gt;
 </pre>
