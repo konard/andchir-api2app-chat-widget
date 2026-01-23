@@ -13,10 +13,13 @@ class Api2AppChatWidget {
             height: 400,
             useBackdrop: true,
             tooltipText: '', // Optional tooltip text, e.g., 'Открыть чат'
+            hoverButtons: [], // Array of hover buttons: [{buttonColor, hoverColor, tooltipText, href, icon}]
             ...options
         };
 
         this.isOpen = false;
+        this.hoverButtonsVisible = false;
+        this.hoverTimeout = null;
         this.mediaQuery = window.matchMedia('(max-width: 768px)');
         this.mediaQueryHandler = (e) => this.handleMediaChange(e); // Сохраняем ссылку на обработчик
 
@@ -129,6 +132,11 @@ class Api2AppChatWidget {
         this.buttonWrapper.style.alignItems = 'center';
         this.buttonWrapper.style.flexShrink = '0';
 
+        // Create hover buttons container first (so it's behind the main button)
+        if (this.options.hoverButtons && this.options.hoverButtons.length > 0) {
+            this.createHoverButtons();
+        }
+
         this.button = document.createElement('button');
         this.button.style.width = '60px';
         this.button.style.height = '60px';
@@ -144,6 +152,8 @@ class Api2AppChatWidget {
         this.button.style.flexShrink = '0';
         this.button.style.transform = 'scale(1)';
         this.button.style.transformOrigin = 'center center';
+        this.button.style.position = 'relative';
+        this.button.style.zIndex = '2';
 
         this.button.innerHTML = this.getChatIcon();
         this.buttonWrapper.appendChild(this.button);
@@ -154,6 +164,129 @@ class Api2AppChatWidget {
         }
 
         this.container.appendChild(this.buttonWrapper);
+    }
+
+    createHoverButtons() {
+        this.hoverButtonsContainer = document.createElement('div');
+        this.hoverButtonsContainer.style.position = 'absolute';
+        this.hoverButtonsContainer.style.display = 'flex';
+        this.hoverButtonsContainer.style.flexDirection = 'column';
+        this.hoverButtonsContainer.style.gap = '10px';
+        this.hoverButtonsContainer.style.zIndex = '1';
+        this.hoverButtonsContainer.style.pointerEvents = 'none';
+
+        // Position based on widget position (top or bottom)
+        const isTopPosition = this.options.position.includes('top');
+        if (isTopPosition) {
+            this.hoverButtonsContainer.style.top = '0';
+        } else {
+            this.hoverButtonsContainer.style.bottom = '0';
+        }
+
+        this.hoverButtonsContainer.style.left = '0';
+
+        this.hoverButtonElements = [];
+
+        this.options.hoverButtons.forEach((hoverBtn, index) => {
+            const btnWrapper = document.createElement('div');
+            btnWrapper.style.position = 'relative';
+            btnWrapper.style.display = 'flex';
+            btnWrapper.style.alignItems = 'center';
+            btnWrapper.style.opacity = '0';
+            btnWrapper.style.transform = 'translateY(0)';
+            btnWrapper.style.transition = `opacity 0.3s ease-in-out, transform 0.3s ease-in-out ${index * 0.05}s`;
+            btnWrapper.style.pointerEvents = 'auto';
+
+            const link = document.createElement('a');
+            link.href = hoverBtn.href || '#';
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.style.textDecoration = 'none';
+            link.style.display = 'block';
+
+            const btn = document.createElement('button');
+            btn.style.width = '60px';
+            btn.style.height = '60px';
+            btn.style.borderRadius = '50%';
+            btn.style.backgroundColor = hoverBtn.buttonColor || this.options.buttonColor;
+            btn.style.border = 'none';
+            btn.style.cursor = 'pointer';
+            btn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+            btn.style.transition = 'background-color 0.3s, transform 0.1s ease-in-out';
+            btn.style.transform = 'scale(1)';
+            btn.style.transformOrigin = 'center center';
+
+            if (hoverBtn.icon) {
+                btn.innerHTML = hoverBtn.icon;
+            }
+
+            const originalColor = hoverBtn.buttonColor || this.options.buttonColor;
+            const hoverColor = hoverBtn.hoverColor || this.options.hoverColor;
+
+            btn.onmouseover = () => {
+                btn.style.backgroundColor = hoverColor;
+                if (hoverBtn.tooltipText) {
+                    this.showHoverButtonTooltip(btnWrapper);
+                }
+            };
+            btn.onmouseout = () => {
+                btn.style.backgroundColor = originalColor;
+                if (hoverBtn.tooltipText) {
+                    this.hideHoverButtonTooltip(btnWrapper);
+                }
+            };
+            btn.onmousedown = () => {
+                btn.style.transform = 'scale(0.9)';
+            };
+            btn.onmouseup = () => {
+                btn.style.transform = 'scale(1)';
+            };
+            btn.onmouseleave = () => {
+                btn.style.transform = 'scale(1)';
+            };
+
+            link.appendChild(btn);
+            btnWrapper.appendChild(link);
+
+            // Create tooltip for hover button if provided
+            if (hoverBtn.tooltipText) {
+                const tooltip = document.createElement('div');
+                tooltip.textContent = hoverBtn.tooltipText;
+                tooltip.style.position = 'absolute';
+                tooltip.style.pointerEvents = 'none';
+                tooltip.style.whiteSpace = 'nowrap';
+                tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                tooltip.style.color = '#ffffff';
+                tooltip.style.padding = '8px 16px';
+                tooltip.style.borderRadius = '20px';
+                tooltip.style.fontSize = '14px';
+                tooltip.style.fontWeight = '500';
+                tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                tooltip.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
+                tooltip.style.opacity = '0';
+                tooltip.style.zIndex = '1';
+
+                const isRightSide = this.options.position.includes('right');
+                if (isRightSide) {
+                    tooltip.style.right = '70px';
+                    tooltip.style.transform = 'translateX(10px)';
+                } else {
+                    tooltip.style.left = '70px';
+                    tooltip.style.transform = 'translateX(-10px)';
+                }
+
+                btnWrapper.appendChild(tooltip);
+                btnWrapper._tooltip = tooltip;
+            }
+
+            this.hoverButtonElements.push(btnWrapper);
+            this.hoverButtonsContainer.appendChild(btnWrapper);
+        });
+
+        this.buttonWrapper.appendChild(this.hoverButtonsContainer);
     }
 
     createTooltip() {
@@ -171,7 +304,7 @@ class Api2AppChatWidget {
         this.tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
         this.tooltip.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
         this.tooltip.style.opacity = '0';
-        this.tooltip.style.zIndex = '1';
+        this.tooltip.style.zIndex = '3';
 
         // Position tooltip to the left of the button
         const isRightSide = this.options.position.includes('right');
@@ -187,9 +320,20 @@ class Api2AppChatWidget {
     }
 
     setupEventListeners() {
+        // Setup hover effect for showing/hiding hover buttons
+        if (this.hoverButtonsContainer) {
+            this.buttonWrapper.onmouseenter = () => {
+                this.showHoverButtons();
+            };
+
+            this.buttonWrapper.onmouseleave = () => {
+                this.scheduleHideHoverButtons();
+            };
+        }
+
         this.button.onmouseover = () => {
             this.button.style.backgroundColor = this.options.hoverColor;
-            if (this.tooltip && !this.isOpen) {
+            if (this.tooltip && !this.isOpen && !this.hoverButtonsVisible) {
                 this.showTooltip();
             }
         };
@@ -260,6 +404,70 @@ class Api2AppChatWidget {
             this.tooltip.style.opacity = '0';
             const isRightSide = this.options.position.includes('right');
             this.tooltip.style.transform = isRightSide ? 'translateX(10px)' : 'translateX(-10px)';
+        }
+    }
+
+    showHoverButtons() {
+        if (!this.hoverButtonsContainer || this.isOpen) return;
+
+        clearTimeout(this.hoverTimeout);
+        this.hoverButtonsVisible = true;
+
+        // Hide main button tooltip when showing hover buttons
+        if (this.tooltip) {
+            this.hideTooltip();
+        }
+
+        const isTopPosition = this.options.position.includes('top');
+
+        this.hoverButtonElements.forEach((btnWrapper, index) => {
+            btnWrapper.style.opacity = '1';
+            // Calculate distance based on button position
+            const distance = (index + 1) * 70; // 60px button + 10px gap
+            if (isTopPosition) {
+                btnWrapper.style.transform = `translateY(-${distance}px)`;
+            } else {
+                btnWrapper.style.transform = `translateY(-${distance}px)`;
+            }
+        });
+    }
+
+    scheduleHideHoverButtons() {
+        if (!this.hoverButtonsContainer) return;
+
+        this.hoverTimeout = setTimeout(() => {
+            this.hideHoverButtons();
+        }, 100);
+    }
+
+    hideHoverButtons() {
+        if (!this.hoverButtonsContainer) return;
+
+        this.hoverButtonsVisible = false;
+
+        this.hoverButtonElements.forEach((btnWrapper) => {
+            btnWrapper.style.opacity = '0';
+            btnWrapper.style.transform = 'translateY(0)';
+
+            // Hide any visible tooltips
+            if (btnWrapper._tooltip) {
+                btnWrapper._tooltip.style.opacity = '0';
+            }
+        });
+    }
+
+    showHoverButtonTooltip(btnWrapper) {
+        if (btnWrapper._tooltip) {
+            btnWrapper._tooltip.style.opacity = '1';
+            btnWrapper._tooltip.style.transform = 'translateX(0)';
+        }
+    }
+
+    hideHoverButtonTooltip(btnWrapper) {
+        if (btnWrapper._tooltip) {
+            btnWrapper._tooltip.style.opacity = '0';
+            const isRightSide = this.options.position.includes('right');
+            btnWrapper._tooltip.style.transform = isRightSide ? 'translateX(10px)' : 'translateX(-10px)';
         }
     }
 
