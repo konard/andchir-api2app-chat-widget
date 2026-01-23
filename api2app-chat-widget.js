@@ -155,6 +155,22 @@ class Api2AppChatWidget {
         this.button.style.position = 'relative';
         this.button.style.zIndex = '2';
 
+        // Create hover border effect using pseudo-element simulation
+        this.buttonBorder = document.createElement('div');
+        this.buttonBorder.style.position = 'absolute';
+        this.buttonBorder.style.top = '50%';
+        this.buttonBorder.style.left = '50%';
+        this.buttonBorder.style.width = 'calc(100% + 6px)';
+        this.buttonBorder.style.height = 'calc(100% + 6px)';
+        this.buttonBorder.style.border = `2px solid ${this.options.buttonColor}`;
+        this.buttonBorder.style.borderRadius = '50%';
+        this.buttonBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        this.buttonBorder.style.opacity = '0';
+        this.buttonBorder.style.transition = 'all 0.3s ease-in-out';
+        this.buttonBorder.style.pointerEvents = 'none';
+        this.buttonBorder.style.zIndex = '1';
+        this.buttonWrapper.appendChild(this.buttonBorder);
+
         this.button.innerHTML = this.getChatIcon();
         this.buttonWrapper.appendChild(this.button);
 
@@ -206,6 +222,22 @@ class Api2AppChatWidget {
                 btnWrapper.style.bottom = '0';
             }
 
+            // Create hover border for the button
+            const hoverBorder = document.createElement('div');
+            hoverBorder.style.position = 'absolute';
+            hoverBorder.style.top = '50%';
+            hoverBorder.style.left = '50%';
+            hoverBorder.style.width = 'calc(100% + 6px)';
+            hoverBorder.style.height = 'calc(100% + 6px)';
+            hoverBorder.style.border = `2px solid ${hoverBtn.buttonColor || this.options.buttonColor}`;
+            hoverBorder.style.borderRadius = '50%';
+            hoverBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            hoverBorder.style.opacity = '0';
+            hoverBorder.style.transition = 'all 0.3s ease-in-out';
+            hoverBorder.style.pointerEvents = 'none';
+            hoverBorder.style.zIndex = '0';
+            btnWrapper.appendChild(hoverBorder);
+
             // Create link styled as a button (no button element inside link)
             const link = document.createElement('a');
             link.href = hoverBtn.href || '#';
@@ -224,6 +256,8 @@ class Api2AppChatWidget {
             link.style.transition = 'background-color 0.3s, transform 0.1s ease-in-out';
             link.style.transform = 'scale(1)';
             link.style.transformOrigin = 'center center';
+            link.style.position = 'relative';
+            link.style.zIndex = '1';
 
             if (hoverBtn.icon) {
                 link.innerHTML = hoverBtn.icon;
@@ -234,12 +268,18 @@ class Api2AppChatWidget {
 
             link.onmouseover = () => {
                 link.style.backgroundColor = hoverColor;
+                // Show hover border
+                hoverBorder.style.transform = 'translate(-50%, -50%) scale(1)';
+                hoverBorder.style.opacity = '1';
                 if (hoverBtn.tooltipText) {
                     this.showHoverButtonTooltip(btnWrapper);
                 }
             };
             link.onmouseout = () => {
                 link.style.backgroundColor = originalColor;
+                // Hide hover border
+                hoverBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                hoverBorder.style.opacity = '0';
                 if (hoverBtn.tooltipText) {
                     this.hideHoverButtonTooltip(btnWrapper);
                 }
@@ -338,6 +378,11 @@ class Api2AppChatWidget {
 
         this.button.onmouseover = () => {
             this.button.style.backgroundColor = this.options.hoverColor;
+            // Show border effect
+            if (this.buttonBorder) {
+                this.buttonBorder.style.transform = 'translate(-50%, -50%) scale(1)';
+                this.buttonBorder.style.opacity = '1';
+            }
             // Show tooltip when hovering on the main button (even when hover buttons are visible)
             if (this.tooltip && !this.isOpen) {
                 this.showTooltip();
@@ -345,6 +390,11 @@ class Api2AppChatWidget {
         };
         this.button.onmouseout = () => {
             this.button.style.backgroundColor = this.options.buttonColor;
+            // Hide border effect
+            if (this.buttonBorder) {
+                this.buttonBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                this.buttonBorder.style.opacity = '0';
+            }
             if (this.tooltip) {
                 this.hideTooltip();
             }
