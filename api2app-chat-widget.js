@@ -22,6 +22,7 @@ class Api2AppChatWidget {
         this.hoverTimeout = null;
         this.mediaQuery = window.matchMedia('(max-width: 768px)');
         this.mediaQueryHandler = (e) => this.handleMediaChange(e); // Сохраняем ссылку на обработчик
+        this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         this.init();
     }
@@ -297,6 +298,37 @@ class Api2AppChatWidget {
                 link.style.transform = 'scale(1)';
             };
 
+            // Touch events for mobile devices
+            if (this.isTouchDevice) {
+                link.addEventListener('touchstart', () => {
+                    link.style.backgroundColor = hoverColor;
+                    link.style.transform = 'scale(0.9)';
+                    hoverBorder.style.transform = 'translate(-50%, -50%) scale(1)';
+                    hoverBorder.style.opacity = '1';
+                    if (hoverBtn.tooltipText) {
+                        this.showHoverButtonTooltip(btnWrapper);
+                    }
+                });
+                link.addEventListener('touchend', () => {
+                    link.style.backgroundColor = originalColor;
+                    link.style.transform = 'scale(1)';
+                    hoverBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    hoverBorder.style.opacity = '0';
+                    if (hoverBtn.tooltipText) {
+                        this.hideHoverButtonTooltip(btnWrapper);
+                    }
+                });
+                link.addEventListener('touchcancel', () => {
+                    link.style.backgroundColor = originalColor;
+                    link.style.transform = 'scale(1)';
+                    hoverBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    hoverBorder.style.opacity = '0';
+                    if (hoverBtn.tooltipText) {
+                        this.hideHoverButtonTooltip(btnWrapper);
+                    }
+                });
+            }
+
             btnWrapper.appendChild(link);
 
             // Create tooltip for hover button if provided
@@ -370,13 +402,35 @@ class Api2AppChatWidget {
     setupEventListeners() {
         // Setup hover effect for showing/hiding hover buttons
         if (this.hoverButtonsContainer) {
-            this.buttonWrapper.onmouseenter = () => {
-                this.showHoverButtons();
-            };
+            // Mouse events for desktop
+            if (!this.isTouchDevice) {
+                this.buttonWrapper.onmouseenter = () => {
+                    this.showHoverButtons();
+                };
 
-            this.buttonWrapper.onmouseleave = () => {
-                this.scheduleHideHoverButtons();
-            };
+                this.buttonWrapper.onmouseleave = () => {
+                    this.scheduleHideHoverButtons();
+                };
+            }
+
+            // Touch events for mobile devices
+            if (this.isTouchDevice) {
+                // Handle touch on button wrapper to show hover buttons
+                this.buttonWrapper.addEventListener('touchstart', (e) => {
+                    // If hover buttons are not visible, show them and prevent default
+                    if (!this.hoverButtonsVisible && !this.isOpen) {
+                        e.preventDefault();
+                        this.showHoverButtons();
+                    }
+                }, { passive: false });
+
+                // Hide hover buttons when tapping outside
+                document.addEventListener('touchstart', (e) => {
+                    if (this.hoverButtonsVisible && !this.buttonWrapper.contains(e.target)) {
+                        this.hideHoverButtons();
+                    }
+                });
+            }
         }
 
         this.button.onmouseover = () => {
@@ -414,6 +468,7 @@ class Api2AppChatWidget {
 
         this.button.onclick = (e) => {
             e.preventDefault();
+            e.stopPropagation(); // Prevent event from bubbling to buttonWrapper
             // Hide hover buttons and tooltip with animation when main button is clicked
             this.hideHoverButtons();
             if (this.tooltip) {
