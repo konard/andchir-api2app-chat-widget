@@ -261,6 +261,8 @@ class Api2AppChatWidget {
 
             if (hoverBtn.icon) {
                 link.innerHTML = hoverBtn.icon;
+                link.querySelector('svg').style.width = '37px';
+                link.querySelector('svg').style.height = '37px';
             }
 
             const originalColor = hoverBtn.buttonColor || this.options.buttonColor;
