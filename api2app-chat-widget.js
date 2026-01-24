@@ -210,8 +210,8 @@ class Api2AppChatWidget {
             btnWrapper.style.alignItems = 'center';
             btnWrapper.style.opacity = '0';
             btnWrapper.style.transform = 'translateY(0)';
-            // Use easeOutBack for transform to create bounce effect when moving from bottom to top
-            btnWrapper.style.transition = `opacity 0.3s ease-in-out ${index * 0.05}s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 0.05}s`;
+            // Initial transition with linear easing (will be changed dynamically)
+            btnWrapper.style.transition = `opacity 0.3s ease-in-out ${index * 0.05}s, transform 0.3s linear ${index * 0.05}s`;
             btnWrapper.style.pointerEvents = 'auto';
             btnWrapper.style.left = '0';
 
@@ -480,6 +480,8 @@ class Api2AppChatWidget {
         const isTopPosition = this.options.position.includes('top');
 
         this.hoverButtonElements.forEach((btnWrapper, index) => {
+            // Use easeOutBack for upward animation (hover in)
+            btnWrapper.style.transition = `opacity 0.3s ease-in-out ${index * 0.05}s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 0.05}s`;
             btnWrapper.style.opacity = '1';
             // Calculate distance based on button position
             // Each button should be positioned at a unique offset from the main button
@@ -505,7 +507,9 @@ class Api2AppChatWidget {
 
         this.hoverButtonsVisible = false;
 
-        this.hoverButtonElements.forEach((btnWrapper) => {
+        this.hoverButtonElements.forEach((btnWrapper, index) => {
+            // Use linear easing for downward animation (hover out)
+            btnWrapper.style.transition = `opacity 0.3s ease-in-out ${index * 0.05}s, transform 0.3s linear ${index * 0.05}s`;
             btnWrapper.style.opacity = '0';
             btnWrapper.style.transform = 'translateY(0)';
 
