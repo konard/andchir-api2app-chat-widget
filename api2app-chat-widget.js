@@ -161,8 +161,8 @@ class Api2AppChatWidget {
         this.buttonBorder.style.position = 'absolute';
         this.buttonBorder.style.top = '50%';
         this.buttonBorder.style.left = '50%';
-        this.buttonBorder.style.width = 'calc(100% + 6px)';
-        this.buttonBorder.style.height = 'calc(100% + 6px)';
+        this.buttonBorder.style.width = '66px';
+        this.buttonBorder.style.height = '66px';
         this.buttonBorder.style.border = `2px solid ${this.options.buttonColor}`;
         this.buttonBorder.style.borderRadius = '50%';
         this.buttonBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
@@ -200,7 +200,8 @@ class Api2AppChatWidget {
             this.hoverButtonsContainer.style.bottom = '0';
         }
 
-        this.hoverButtonsContainer.style.left = '0';
+        this.hoverButtonsContainer.style.left = '50%';
+        this.hoverButtonsContainer.style.transform = 'translateX(-50%)';
 
         this.hoverButtonElements = [];
 
@@ -210,11 +211,11 @@ class Api2AppChatWidget {
             btnWrapper.style.display = 'flex';
             btnWrapper.style.alignItems = 'center';
             btnWrapper.style.opacity = '0';
-            btnWrapper.style.transform = 'translateY(0)';
+            btnWrapper.style.transform = 'translateX(-50%) translateY(0)';
             // Initial transition with linear easing (will be changed dynamically)
             btnWrapper.style.transition = `opacity 0.3s ease-in-out ${index * 0.05}s, transform 0.3s linear ${index * 0.05}s`;
             btnWrapper.style.pointerEvents = 'auto';
-            btnWrapper.style.left = '0';
+            btnWrapper.style.left = '50%';
 
             // Position based on widget position (top or bottom)
             const isTopPosition = this.options.position.includes('top');
@@ -229,8 +230,8 @@ class Api2AppChatWidget {
             hoverBorder.style.position = 'absolute';
             hoverBorder.style.top = '50%';
             hoverBorder.style.left = '50%';
-            hoverBorder.style.width = 'calc(100% + 6px)';
-            hoverBorder.style.height = 'calc(100% + 6px)';
+            hoverBorder.style.width = '66px';
+            hoverBorder.style.height = '66px';
             hoverBorder.style.border = `2px solid ${hoverBtn.buttonColor || this.options.buttonColor}`;
             hoverBorder.style.borderRadius = '50%';
             hoverBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
@@ -542,9 +543,9 @@ class Api2AppChatWidget {
             // Each button should be positioned at a unique offset from the main button
             const distance = (index + 1) * 70; // 60px button + 10px gap
             if (isTopPosition) {
-                btnWrapper.style.transform = `translateY(${distance}px)`;
+                btnWrapper.style.transform = `translateX(-50%) translateY(${distance}px)`;
             } else {
-                btnWrapper.style.transform = `translateY(-${distance}px)`;
+                btnWrapper.style.transform = `translateX(-50%) translateY(-${distance}px)`;
             }
         });
     }
@@ -566,7 +567,7 @@ class Api2AppChatWidget {
             // Use linear easing for downward animation (hover out)
             btnWrapper.style.transition = `opacity 0.3s ease-in-out ${index * 0.05}s, transform 0.3s linear ${index * 0.05}s`;
             btnWrapper.style.opacity = '0';
-            btnWrapper.style.transform = 'translateY(0)';
+            btnWrapper.style.transform = 'translateX(-50%) translateY(0)';
 
             // Hide any visible tooltips
             if (btnWrapper._tooltip) {
