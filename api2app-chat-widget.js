@@ -210,7 +210,8 @@ class Api2AppChatWidget {
             btnWrapper.style.alignItems = 'center';
             btnWrapper.style.opacity = '0';
             btnWrapper.style.transform = 'translateY(0)';
-            btnWrapper.style.transition = `opacity 0.3s ease-in-out, transform 0.3s ease-in-out ${index * 0.05}s`;
+            // Use easeOutBack for transform to create bounce effect when moving from bottom to top
+            btnWrapper.style.transition = `opacity 0.3s ease-in-out ${index * 0.05}s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 0.05}s`;
             btnWrapper.style.pointerEvents = 'auto';
             btnWrapper.style.left = '0';
 
