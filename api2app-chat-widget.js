@@ -530,6 +530,18 @@ class Api2AppChatWidget {
                         this.toggle();
                     }, 100);
                 }
+                // Третий тап: закрыть чат и вернуть первоначальную иконку
+                else if (this.isOpen) {
+                    e.preventDefault();
+
+                    // Визуальный эффект нажатия
+                    this.button.style.transform = 'scale(0.9)';
+
+                    // Закрыть чат после анимации
+                    setTimeout(() => {
+                        this.toggle();
+                    }, 100);
+                }
             });
 
             this.button.addEventListener('touchend', () => {
