@@ -23,6 +23,8 @@ class Api2AppChatWidget {
         this.mediaQuery = window.matchMedia('(max-width: 768px)');
         this.mediaQueryHandler = (e) => this.handleMediaChange(e); // Сохраняем ссылку на обработчик
         this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        this.mainButtonTapped = false; // Флаг для отслеживания первого тапа на основной кнопке
+        this.hoverButtonTapStates = []; // Массив для отслеживания состояния тапов на hover buttons
 
         this.init();
     }
@@ -301,32 +303,34 @@ class Api2AppChatWidget {
 
             // Touch events for mobile devices
             if (this.isTouchDevice) {
-                link.addEventListener('touchstart', () => {
+                const buttonIndex = index;
+                this.hoverButtonTapStates[buttonIndex] = false;
+
+                link.addEventListener('touchstart', (e) => {
                     link.style.backgroundColor = hoverColor;
                     link.style.transform = 'scale(0.9)';
                     hoverBorder.style.transform = 'translate(-50%, -50%) scale(1)';
                     hoverBorder.style.opacity = '1';
-                    if (hoverBtn.tooltipText) {
+
+                    // При первом тапе показываем tooltip и отменяем переход по ссылке
+                    if (!this.hoverButtonTapStates[buttonIndex] && hoverBtn.tooltipText) {
+                        e.preventDefault();
                         this.showHoverButtonTooltip(btnWrapper);
+                        this.hoverButtonTapStates[buttonIndex] = true;
                     }
+                    // При втором тапе ссылка сработает нормально (не отменяем default)
                 });
                 link.addEventListener('touchend', () => {
                     link.style.backgroundColor = originalColor;
                     link.style.transform = 'scale(1)';
                     hoverBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
                     hoverBorder.style.opacity = '0';
-                    if (hoverBtn.tooltipText) {
-                        this.hideHoverButtonTooltip(btnWrapper);
-                    }
                 });
                 link.addEventListener('touchcancel', () => {
                     link.style.backgroundColor = originalColor;
                     link.style.transform = 'scale(1)';
                     hoverBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
                     hoverBorder.style.opacity = '0';
-                    if (hoverBtn.tooltipText) {
-                        this.hideHoverButtonTooltip(btnWrapper);
-                    }
                 });
             }
 
@@ -416,19 +420,13 @@ class Api2AppChatWidget {
 
             // Touch events for mobile devices
             if (this.isTouchDevice) {
-                // Handle touch on button wrapper to show hover buttons
-                this.buttonWrapper.addEventListener('touchstart', (e) => {
-                    // If hover buttons are not visible, show them and prevent default
-                    if (!this.hoverButtonsVisible && !this.isOpen) {
-                        e.preventDefault();
-                        this.showHoverButtons();
-                    }
-                }, { passive: false });
-
-                // Hide hover buttons when tapping outside
+                // Hide hover buttons and reset tap states when tapping outside
                 document.addEventListener('touchstart', (e) => {
                     if (this.hoverButtonsVisible && !this.buttonWrapper.contains(e.target)) {
                         this.hideHoverButtons();
+                        this.mainButtonTapped = false;
+                        // Сбросить состояние тапов для hover buttons
+                        this.hoverButtonTapStates.fill(false);
                     }
                 });
             }
@@ -470,15 +468,90 @@ class Api2AppChatWidget {
         this.button.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation(); // Prevent event from bubbling to buttonWrapper
-            // Hide hover buttons and tooltip with animation when main button is clicked
-            this.hideHoverButtons();
-            if (this.tooltip) {
-                this.hideTooltip();
+            // Only handle click on non-touch devices
+            if (!this.isTouchDevice) {
+                // Hide hover buttons and tooltip with animation when main button is clicked
+                this.hideHoverButtons();
+                if (this.tooltip) {
+                    this.hideTooltip();
+                }
+                setTimeout(() => {
+                    this.toggle();
+                }, 100);
             }
-            setTimeout(() => {
-                this.toggle();
-            }, 100);
         };
+
+        // Touch events for main button on mobile devices
+        if (this.isTouchDevice) {
+            this.button.addEventListener('touchstart', (e) => {
+                // Первый тап: показать tooltip и hoverButtons
+                if (!this.mainButtonTapped && !this.isOpen) {
+                    e.preventDefault();
+                    this.mainButtonTapped = true;
+
+                    // Показать tooltip
+                    if (this.tooltip) {
+                        this.showTooltip();
+                    }
+
+                    // Показать hover buttons
+                    if (this.hoverButtonsContainer) {
+                        this.showHoverButtons();
+                    }
+
+                    // Визуальный эффект нажатия
+                    this.button.style.backgroundColor = this.options.hoverColor;
+                    this.button.style.transform = 'scale(0.9)';
+                    if (this.buttonBorder) {
+                        this.buttonBorder.style.transform = 'translate(-50%, -50%) scale(1)';
+                        this.buttonBorder.style.opacity = '1';
+                    }
+                }
+                // Второй тап: открыть чат, скрыть tooltip и hoverButtons
+                else if (this.mainButtonTapped && !this.isOpen) {
+                    e.preventDefault();
+                    this.mainButtonTapped = false;
+
+                    // Скрыть tooltip
+                    if (this.tooltip) {
+                        this.hideTooltip();
+                    }
+
+                    // Скрыть hover buttons
+                    if (this.hoverButtonsContainer) {
+                        this.hideHoverButtons();
+                    }
+
+                    // Визуальный эффект нажатия
+                    this.button.style.transform = 'scale(0.9)';
+
+                    // Открыть чат после анимации
+                    setTimeout(() => {
+                        this.toggle();
+                    }, 100);
+                }
+            });
+
+            this.button.addEventListener('touchend', () => {
+                // Вернуть визуальное состояние
+                this.button.style.backgroundColor = this.options.buttonColor;
+                this.button.style.transform = 'scale(1)';
+                if (this.buttonBorder) {
+                    this.buttonBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    this.buttonBorder.style.opacity = '0';
+                }
+            });
+
+            this.button.addEventListener('touchcancel', () => {
+                // Вернуть визуальное состояние
+                this.button.style.backgroundColor = this.options.buttonColor;
+                this.button.style.transform = 'scale(1)';
+                if (this.buttonBorder) {
+                    this.buttonBorder.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    this.buttonBorder.style.opacity = '0';
+                }
+            });
+        }
 
         this.mediaQuery.addEventListener('change', this.mediaQueryHandler);
 
@@ -574,6 +647,11 @@ class Api2AppChatWidget {
                 btnWrapper._tooltip.style.opacity = '0';
             }
         });
+
+        // Сбросить состояние тапов для hover buttons
+        if (this.isTouchDevice) {
+            this.hoverButtonTapStates.fill(false);
+        }
     }
 
     showHoverButtonTooltip(btnWrapper) {
@@ -619,6 +697,11 @@ class Api2AppChatWidget {
         this.iframeBox.style.display = 'block';
         this.button.innerHTML = this.getArrowIcon();
         this.backdrop.style.display = this.options.useBackdrop ? 'block' : 'none';
+
+        // Сбросить состояние тапа для мобильных устройств
+        if (this.isTouchDevice) {
+            this.mainButtonTapped = false;
+        }
 
         // Trigger animation after display is set
         setTimeout(() => {
